@@ -1,0 +1,11 @@
+{
+  "name": "@app/tagloom",
+  "version": "0.1.0",
+  "exports": {
+    "./core": "./core/mod.ts",
+    "./infra": "./infra/mod.ts",
+    "./server": "./server/mod.ts",
+    "./share": "./share/mod.ts",
+    "./client": "./client/mod.ts"
+  }
+}

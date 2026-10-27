@@ -1,0 +1,18 @@
+// share：前后端共用的类型、分类树和纯函数（Prompt 汇总、事实与候选操作、提示、存档格式）。
+// 不依赖 zod / Deno / DOM；core 和前端都可以 import。
+export * from './fields.ts'
+export * from './model.ts'
+export * from './catalog.ts'
+export * from './assemble.ts'
+export * from './segment.ts'
+export * from './custom-tags.ts'
+export * from './agent.ts'
+export * from './facts.ts'
+export * from './warnings.ts'
+export * from './formats.ts'
+export * from './archive.ts'
+export * from './presence.ts'
+export * from './tag-targets.ts'
+export * from './paths.ts'
+export * from './scene.ts'
+export * from './scene-import.ts'

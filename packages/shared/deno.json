@@ -1,0 +1,9 @@
+{
+  "name": "@app/shared",
+  "version": "0.1.0",
+  "exports": {
+    "./png": "./png/mod.ts",
+    "./novelai": "./novelai/mod.ts",
+    "./prompt-bundle": "./prompt-bundle/mod.ts"
+  }
+}

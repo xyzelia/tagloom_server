@@ -1,0 +1,35 @@
+{
+  "workspace": [
+    "./packages/plugin-sdk",
+    "./packages/shared",
+    "./packages/tagloom"
+  ],
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "deno.ns"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": [
+      "vite/client"
+    ]
+  },
+  "tasks": {
+    "check": "deno check server.ts src/ packages/",
+    "test": "deno test --allow-read --allow-write --allow-env=NODE_ENV,LOG_TOKENS,LOG_STREAM packages/ src/",
+    "tagloom-agent": "deno run -q --no-prompt --allow-net=localhost,127.0.0.1 --allow-env=TAGLOOM_URL packages/tagloom/ai-tools/cli.ts",
+    "tagloom-catalog": "deno run -q --no-prompt --allow-read --allow-write=data/tagloom --allow-run=git --allow-env=LOG_TOKENS,LOG_STREAM packages/tagloom/catalog-import/cli.ts"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "semiColons": false
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}

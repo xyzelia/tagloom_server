@@ -1,0 +1,243 @@
+<!doctype html>
+<!--
+  插件文档的渲染页 + 文件树（静态页，不经过 React / 构建）。
+  服务端只返回原文：/api/doc/<插件>/<路径>.md 是 text/markdown，目录返回 {path, dirs, files} JSON，/api/doc 返回 {modules}。
+  用法：/doc-view.html?src=/api/doc/<插件>/<路径>.md；不带 src 或 src 是目录（以 / 结尾）时只显示文件树。
+  渲染用 /vendor/markdeep/markdeep.min.js（Markdeep，BSD-2-Clause，协议见该文件开头）。
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文档</title>
+<style>
+  /* 只给自己加的元素定样式；正文样式归 Markdeep */
+  :root { color-scheme: light; }
+  #dv-tree {
+    position: fixed; inset: 0 auto 0 0; width: 240px; overflow: auto;
+    padding: 12px 8px 24px; box-sizing: border-box; z-index: 10;
+    background: #f6f7f9; border-right: 1px solid #dde1e6;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-align: left;
+  }
+  #dv-tree ul { list-style: none; margin: 0; padding-left: 14px; }
+  #dv-tree > ul { padding-left: 0; }
+  #dv-tree summary { cursor: pointer; padding: 2px 4px; border-radius: 4px; color: #444; }
+  #dv-tree a { display: block; padding: 2px 4px; border-radius: 4px; color: #1d4ed8; text-decoration: none;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #dv-tree a:hover, #dv-tree summary:hover { background: #e7eaee; }
+  #dv-tree a[aria-current] { background: #1d4ed8; color: #fff; }
+  #dv-tree .dv-note { color: #888; padding: 2px 4px; }
+  #dv-bar {
+    position: fixed; top: 8px; right: 12px; z-index: 11; display: flex; gap: 12px;
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: rgba(255, 255, 255, .9); padding: 2px 8px; border-radius: 6px;
+  }
+  #dv-bar a, #dv-bar button { color: #1d4ed8; text-decoration: none; background: none; border: 0;
+    font: inherit; cursor: pointer; padding: 0; }
+  #dv-toggle { display: none; }
+  .dv-message { max-width: 680px; margin: 80px auto; color: #555;
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  /* 宽屏：左边留出文件树的位置，正文在剩下的宽度里居中 */
+  @media (min-width: 900px) { html { padding-left: 240px; } }
+  /* 窄屏：文件树收起，点“目录”展开成覆盖层 */
+  @media (max-width: 899px) {
+    #dv-tree { display: none; width: min(300px, 85vw); box-shadow: 0 0 24px rgba(0, 0, 0, .2); }
+    #dv-tree.dv-open { display: block; }
+    #dv-toggle { display: inline; }
+  }
+</style>
+<script>
+'use strict'
+;(function () {
+  const PREFIX = '/api/doc/'
+  const params = new URLSearchParams(location.search)
+  const src = params.get('src') || ''
+
+  // 只接受同源、/api/doc/ 下的地址；返回解码后的 { module, path, apiPath } 或 null
+  function parseSrc(value) {
+    if (!value) return { module: '', path: '', apiPath: '' }
+    let url
+    try { url = new URL(value, location.origin) } catch { return null }
+    if (url.origin !== location.origin || !url.pathname.startsWith(PREFIX)) return null
+    let parts
+    try { parts = url.pathname.slice(PREFIX.length).split('/').map(decodeURIComponent) } catch { return null }
+    return { module: parts[0], path: parts.slice(1).join('/'), apiPath: url.pathname }
+  }
+  const enc = (path) => path.split('/').map(encodeURIComponent).join('/')
+  const apiUrl = (module, path) => PREFIX + encodeURIComponent(module) + '/' + enc(path)
+  const viewUrl = (apiPath, hash) => '/doc-view.html?src=' + encodeURIComponent(apiPath) + (hash || '')
+
+  // 锚点目标：Markdeep 生成的锚点名是百分号编码过的，编码 / 解码两种写法都找一下
+  function scrollToHash(hash) {
+    const raw = hash.slice(1)
+    let decoded = raw
+    try { decoded = decodeURIComponent(raw) } catch { /* 保留原样 */ }
+    for (const name of [raw, decoded, encodeURIComponent(decoded)]) {
+      const target = document.getElementById(name) || document.getElementsByName(name)[0]
+      if (target) { target.scrollIntoView(); return }
+    }
+  }
+
+  const current = parseSrc(src)
+  const isDoc = !!current && current.path.endsWith('.md')
+
+  function el(tag, attrs, text) {
+    const node = document.createElement(tag)
+    for (const [k, v] of Object.entries(attrs || {})) node.setAttribute(k, v)
+    if (text !== undefined) node.textContent = text
+    return node
+  }
+
+  // ---- 文件树：展开目录时才请求该层列表，结果缓存在内存里 ----
+  const listings = new Map()
+  async function listing(module, dir) {
+    const key = module + '/' + dir
+    if (!listings.has(key)) {
+      listings.set(key, fetch(apiUrl(module, dir)).then((r) => {
+        if (!r.ok) throw new Error('HTTP ' + r.status)
+        return r.json()
+      }))
+    }
+    return listings.get(key)
+  }
+
+  // 一个目录节点：<details> 第一次展开时加载内容；返回 { details, loaded }
+  function dirNode(module, dir, label) {
+    const details = el('details')
+    details.append(el('summary', { title: module + '/' + dir }, label))
+    const list = el('ul')
+    details.append(list)
+    let loading = null
+    const load = () => loading ??= listing(module, dir).then((data) => {
+      for (const name of data.dirs) {
+        const child = dirNode(module, data.path + name + '/', name + '/')
+        const li = el('li')
+        li.append(child.details)
+        li.dataset.dir = data.path + name + '/'
+        li.child = child
+        list.append(li)
+      }
+      for (const file of data.files) {
+        const path = data.path + file.name
+        const a = el('a', { href: viewUrl(apiUrl(module, path)), title: path }, file.title)
+        if (current && current.module === module && current.path === path) a.setAttribute('aria-current', 'page')
+        const li = el('li')
+        li.append(a)
+        list.append(li)
+      }
+      if (data.dirs.length === 0 && data.files.length === 0) list.append(el('li', { class: 'dv-note' }, '（空）'))
+    }).catch((e) => { list.append(el('li', { class: 'dv-note' }, '加载失败：' + e.message)) })
+    details.addEventListener('toggle', () => { if (details.open) load() })
+    return { details, list, open: async () => { details.open = true; await load() } }
+  }
+
+  async function buildTree() {
+    const nav = el('nav', { id: 'dv-tree', 'aria-label': '文档目录' })
+    const root = el('ul')
+    nav.append(root)
+    document.body.append(nav)
+    let modules = []
+    try {
+      const r = await fetch(PREFIX.slice(0, -1))
+      modules = (await r.json()).modules
+    } catch (e) {
+      root.append(el('li', { class: 'dv-note' }, '文档列表加载失败：' + e.message))
+      return
+    }
+    for (const module of modules) {
+      const node = dirNode(module, '', module)
+      const li = el('li')
+      li.append(node.details)
+      root.append(li)
+      // 当前文档所在插件和各级上层目录自动展开（逐层请求）
+      if (current && current.module === module) {
+        await node.open()
+        let list = node.list
+        const segments = current.path.split('/').slice(0, -1)
+        for (let i = 0; i < segments.length; i++) {
+          const dir = segments.slice(0, i + 1).join('/') + '/'
+          const li = [...list.children].find((c) => c.dataset.dir === dir)
+          if (!li) break
+          await li.child.open()
+          list = li.child.list
+        }
+        nav.querySelector('a[aria-current]')?.scrollIntoView({ block: 'center' })
+      }
+    }
+  }
+
+  // ---- 右上角工具条：原文 / 返回工作台 / 窄屏的目录开关 ----
+  function buildBar() {
+    const bar = el('div', { id: 'dv-bar' })
+    const toggle = el('button', { id: 'dv-toggle', type: 'button' }, '目录')
+    toggle.addEventListener('click', () => document.getElementById('dv-tree')?.classList.toggle('dv-open'))
+    bar.append(toggle)
+    if (isDoc) bar.append(el('a', { href: current.apiPath, target: '_blank', rel: 'noopener' }, '原文'))
+    bar.append(el('a', { href: '/' }, '返回工作台'))
+    document.body.append(bar)
+  }
+
+  function showMessage(text) {
+    document.body.append(el('div', { class: 'dv-message' }, text))
+    buildBar()
+    buildTree()
+  }
+
+  // ---- 文档里的链接 ----
+  function onClick(e) {
+    const a = e.target.closest('a[href]')
+    if (!a || a.closest('#dv-tree, #dv-bar') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    const url = new URL(a.href)
+    if (url.origin !== location.origin) return
+    // 本篇里的锚点（目录、章节引用）：<base> 指向原文地址，需要自己滚动
+    if (url.pathname === current.apiPath && url.hash) {
+      e.preventDefault()
+      scrollToHash(url.hash)
+      history.replaceState(null, '', location.pathname + location.search + url.hash)
+      return
+    }
+    // 其他文档或目录：用渲染页打开
+    if (url.pathname.startsWith(PREFIX)) {
+      e.preventDefault()
+      location.href = viewUrl(url.pathname, url.hash)
+    }
+  }
+
+  async function renderDoc() {
+    let text
+    try {
+      const r = await fetch(current.apiPath)
+      if (!r.ok) throw new Error(r.status === 404 ? '找不到这个文档' : 'HTTP ' + r.status)
+      text = await r.text()
+    } catch (e) {
+      showMessage('文档加载失败：' + e.message)
+      return
+    }
+    // 相对链接（../README.md）按原文地址解析
+    document.head.append(el('base', { href: current.apiPath }))
+    // 原文放进 <script type="preformatted">，浏览器不会把正文里的 <tag> 当 HTML 解析；
+    // Markdeep 会去掉这层包裹，并把转义过的结束标签还原（这段内联脚本里不能直接写出结束标签）
+    document.body.innerHTML = '<script type="preformatted">\n' +
+      text.replace(/<\/script/gi, '<\\/script') + '\n</' + 'script>'
+    window.markdeepOptions = {
+      tocStyle: 'auto',
+      onLoad: () => {
+        // Markdeep 没设标题时用第一个标题，再没有就用文件名
+        if (!document.title || document.title === '文档') {
+          document.title = document.querySelector('h1')?.textContent.trim() || current.path.split('/').pop()
+        }
+        buildBar()
+        buildTree()
+        if (location.hash) scrollToHash(location.hash)
+      },
+    }
+    document.addEventListener('click', onClick)
+    document.body.append(el('script', { src: '/vendor/markdeep/markdeep.min.js', charset: 'utf-8' }))
+  }
+
+  addEventListener('DOMContentLoaded', () => {
+    if (!current) showMessage('地址不正确：src 必须是本站 /api/doc/ 下的路径。')
+    else if (!isDoc) showMessage('从左侧目录选择一篇文档。')
+    else renderDoc()
+  })
+})()
+</script>
+<body></body>

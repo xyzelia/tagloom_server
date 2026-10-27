@@ -1,0 +1,2 @@
+# 第三方原样文件（public/vendor/）不做换行转换，保持和上游逐字节一致
+/public/vendor/** -text

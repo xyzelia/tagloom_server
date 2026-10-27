@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TagLoom</title>
+    <!-- 首次绘制前设置主题，避免保存的模式与系统模式不同导致闪烁。 -->
+    <script>
+    ;(() => {
+      let saved
+      try {
+        saved = localStorage.getItem('image-workbench-theme')
+      } catch {}
+      const theme = saved === 'light' || saved === 'dark'
+        ? saved
+        : matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      document.documentElement.dataset.theme = theme
+      document.documentElement.style.colorScheme = theme
+    })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/client/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+# 忽略规则（路径相对本目录，即项目根目录）。
+
+# 依赖与构建产物
+node_modules
+dist
+out
+.vite
+
+# 环境变量：任何目录下的 .env 都不提交；示例文件 .env.example 需要提交
+.env
+.env.*
+!.env.example
+
+# 系统 / 编辑器文件
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# 运行时数据：人物 JSON、场景、词库、词库来源都在 data/ 下
+/data/*
+
+# 万一放在 data/ 以外的数据库及其临时文件
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+*.db
+
+# 原子写入时的临时文件（人物 JSON 先写 *.tmp 再改名）
+*.tmp

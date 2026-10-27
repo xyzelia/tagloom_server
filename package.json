@@ -1,0 +1,33 @@
+{
+  "name": "tagloom-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "deno run -A --env-file=.env npm:vite",
+    "build": "vite build",
+    "start": "deno run --allow-net --allow-read --allow-env --allow-write=./data --allow-run=git --env-file=.env server.ts"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@hono/zod-validator": "^0.9.1",
+    "@tanstack/react-query": "^5.104.1",
+    "@viselect/react": "^3.10.1",
+    "bulma": "^1.0.4",
+    "csv-parse": "^6.2.1",
+    "hono": "^4.13.13",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "wouter": "^3.13.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@hono/vite-dev-server": "^0.26.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.3"
+  }
+}

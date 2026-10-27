@@ -1,0 +1,1452 @@
+/* 宿主全局样式：Bulma 不够用时的少量补充（见 README「前端样式」）。
+   只加新的工具类，不覆盖 Bulma 的类；颜色一律用 --bulma-* 变量，暗色模式自动适配。 */
+
+/* 跳到正文：平时隐藏，键盘 Tab 聚焦时出现在左上角 */
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background-color: var(--bulma-scheme-main);
+  border-radius: var(--bulma-radius);
+}
+.skip-link:focus {
+  top: 0.5rem;
+}
+/* 换页时用脚本聚焦的内容区，不显示焦点框 */
+#main:focus {
+  outline: none;
+}
+
+/* 长文本最多显示两行（列表里的 prompt），完整内容放在 title 里 */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* 长名称和路径在窄屏折行，不撑开页面。 */
+.text-break {
+  overflow-wrap: anywhere;
+}
+
+/* 不换行（表格里的尺寸、时间） */
+.text-nowrap {
+  white-space: nowrap;
+}
+
+/* 吸附在视口顶部 / 底部的操作栏：长表单滚到哪里都能点到保存 */
+.action-bar {
+  position: sticky;
+  z-index: 20;
+  background-color: var(--bulma-scheme-main);
+  padding-block: 0.75rem;
+}
+.action-bar.is-top {
+  top: 0;
+  border-bottom: 1px solid var(--bulma-border-weak);
+}
+.action-bar.is-bottom {
+  bottom: 0;
+  border-top: 1px solid var(--bulma-border-weak);
+}
+.action-bar .buttons {
+  margin-bottom: 0;
+}
+
+/* 缩略图：固定方形格子（配合 Bulma 的 .image.is-square），图片完整显示不裁切，加载时不跳动 */
+.thumb {
+  display: block;
+  border-radius: var(--bulma-radius);
+  outline-offset: 2px;
+}
+.thumb .image {
+  background-color: var(--bulma-scheme-main-ter);
+  border-radius: var(--bulma-radius);
+  overflow: hidden;
+}
+.thumb .image img {
+  object-fit: contain;
+}
+.thumb:hover .image {
+  box-shadow: 0 0 0 2px var(--bulma-border);
+}
+.thumb.is-current .image {
+  box-shadow: 0 0 0 3px var(--bulma-link);
+}
+/* 图库搜索状态条：浅色底 + 左侧色条，和浏览文件夹时明显不同 */
+.gallery-search-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--bulma-link);
+  border-radius: var(--bulma-radius);
+  background-color: var(--bulma-link-soft);
+  color: var(--bulma-link-on-scheme);
+  font-size: 0.875rem;
+}
+.gallery-search-banner .has-text-grey {
+  color: var(--bulma-text) !important;
+}
+.gallery-search-exit {
+  margin-left: auto;
+}
+/* 标题上方的小字：当前显示的是“文件夹”还是“搜索结果” */
+.gallery-mode-label {
+  font-size: 0.75rem;
+  color: var(--bulma-text-weak);
+  line-height: 1.2;
+}
+.gallery-tree-hint {
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid var(--bulma-link);
+  font-size: 0.75rem;
+  color: var(--bulma-text-weak);
+}
+/* 图库网格：缩小间距、说明只占一行（完整路径在 title 里），一屏多看几张 */
+.gallery-grid {
+  --bulma-column-gap: 0.25rem;
+}
+.gallery-caption {
+  margin-top: 0.125rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 不超过视口高度的大图（最近结果主图、查看器） */
+.fit-viewport {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 12rem);
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
+
+/* 图片查看器：比 Bulma 默认的 640px 弹窗宽 */
+.viewer-content {
+  width: min(96vw, 1400px);
+  max-height: 100dvh;
+}
+.viewer-content .fit-viewport {
+  max-height: calc(100dvh - 6rem);
+}
+/* 原图链接的点击范围贴合实际图片，不包含两侧暗色空白。 */
+.viewer-image-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* 图库看图模式：全屏黑底（深浅主题下都用黑底看图），工具栏浮在图片上方 */
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: #000;
+  color: #f5f5f5;
+}
+.reader-stage {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.reader-stage img {
+  display: block;
+  margin: auto;
+}
+.reader-stage.is-fit-screen {
+  display: flex;
+}
+.reader-stage.is-fit-screen img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.reader-stage.is-fit-width img {
+  width: 100%;
+  height: auto;
+}
+.reader-bar {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.5rem
+    max(0.75rem, env(safe-area-inset-left));
+  background-color: rgb(0 0 0 / 0.65);
+  transition: opacity 0.2s ease-out;
+}
+.reader-bar.is-top {
+  top: 0;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+.reader-bar.is-bottom {
+  bottom: 0;
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+/* 隐藏时只是透明、不可点；仍可用 Tab 聚焦，聚焦时重新显示 */
+.reader-bar.is-concealed {
+  opacity: 0;
+  pointer-events: none;
+}
+.reader-bar .button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.reader-position {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.reader-caption {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.reader-caption a {
+  color: var(--bulma-link-light, #b5c7ff);
+}
+.reader-settings {
+  position: absolute;
+  top: 4rem;
+  right: 0.75rem;
+  z-index: 1;
+  width: min(20rem, calc(100vw - 1.5rem));
+}
+
+/* 图库目录树：可展开 / 折叠；名称过长单行省略，不撑开侧栏 */
+.folder-tree .menu-list ul {
+  margin-block: 0;
+  margin-inline-start: 0.75rem;
+  padding-inline-start: 0.25rem;
+}
+.folder-row {
+  display: flex;
+  align-items: center;
+}
+/* 加 .folder-tree 前缀：Bulma 的 .menu-list button 会给按钮 width: 100%，否则会占满整行 */
+.folder-tree .folder-toggle {
+  flex-shrink: 0;
+  width: 1.75rem;
+  min-height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  text-align: center;
+  color: var(--bulma-text-weak);
+  cursor: pointer;
+}
+.folder-tree .folder-toggle:hover {
+  color: var(--bulma-text-strong);
+}
+.folder-tree .folder-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+/* 长名字单行省略，完整路径见链接的 title */
+.folder-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 拆成三段的长名字：头尾固定显示，只省略中段，同前缀的目录也能靠结尾区分 */
+.folder-name.is-split {
+  display: flex;
+}
+.folder-name-head,
+.folder-name-tail {
+  flex-shrink: 0;
+}
+/* 留一点宽度，中段压到 0 时省略号也不会消失 */
+.folder-name-middle {
+  min-width: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.folder-count {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  font-size: 0.75rem;
+  color: var(--bulma-text-weak);
+}
+.folder-link.is-active .folder-count {
+  color: inherit;
+}
+/* 图库标题栏：宽屏左右两组，窄屏自动折行，不像 Bulma level 那样竖排居中 */
+.gallery-toolbar,
+.gallery-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-width: 0;
+}
+.gallery-toolbar {
+  justify-content: space-between;
+}
+/* 窄屏目录抽屉：从左侧滑出 */
+.folder-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+.folder-drawer-panel {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: min(20rem, 85vw);
+  overflow: auto;
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  background-color: var(--bulma-scheme-main);
+  box-shadow: var(--bulma-shadow);
+}
+.folder-drawer-panel .folder-toggle,
+.folder-drawer-panel .folder-link {
+  min-height: 44px;
+}
+
+/* 当前任务状态卡：执行中时左侧加一条强调色 */
+.active-job.is-running {
+  box-shadow: inset 4px 0 0 var(--bulma-primary), var(--bulma-shadow);
+}
+
+/* 长 JSON 不撑开页面 */
+.code-block {
+  max-height: 32rem;
+  overflow: auto;
+}
+
+/* 画风结果只读预览：保留换行，长提示词在窄屏折行，不撑开页面。 */
+.prompt-preview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 16rem;
+  overflow: auto;
+  color: var(--bulma-text);
+  background-color: var(--bulma-scheme-main-ter);
+}
+
+/* 标签页文字后面的计数 */
+.tabs .tag {
+  margin-inline-start: 0.4em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* TagLoom：右侧预览随页面滚动保持可见。吸顶位置让开顶部操作栏（高度由页面写入
+   --tagloom-bar-h），内容比屏幕高时在预览栏内滚动 */
+.tagloom-preview {
+  position: sticky;
+  top: calc(var(--tagloom-bar-h, 7rem) + 0.75rem);
+  max-height: calc(100dvh - var(--tagloom-bar-h, 7rem) - 1.5rem);
+  overflow: auto;
+}
+/* 目录跳转时分类标题停在操作栏下方 */
+.tagloom-section,
+.tagloom-anchor {
+  scroll-margin-top: calc(var(--tagloom-bar-h, 7rem) + 0.75rem);
+}
+/* 编辑页顶部操作栏：一行放返回 / 项目名 / 保存 / 导出，一行放目录和全局搜索；窄屏自动折行 */
+.tagloom-editbar-row,
+.tagloom-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tagloom-toolbar {
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+.tagloom-editbar-row .button {
+  margin-bottom: 0;
+}
+.tagloom-editbar-title {
+  flex: 1 1 6rem;
+  min-width: 0;
+  width: auto;
+}
+.tagloom-editbar-row .tagloom-global-search {
+  flex: 1 1 14rem;
+  min-width: 0;
+  margin-top: 0;
+}
+/* 目录下拉：分组标题加粗，子项缩进；条目多时在下拉里滚动 */
+.tagloom-section-nav .dropdown-menu {
+  min-width: 16rem;
+}
+.tagloom-section-nav .dropdown-content {
+  max-height: min(70dvh, 32rem);
+  overflow: auto;
+}
+.tagloom-section-nav .dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+}
+.tagloom-section-nav .dropdown-item.is-nested {
+  padding-inline-start: 2rem;
+}
+/* 窄屏：底部“预览 Prompt”按钮和从底部弹出的预览面板 */
+.tagloom-preview-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 25;
+  min-height: 44px;
+  box-shadow: var(--bulma-shadow);
+}
+.tagloom-fab-spacer {
+  height: 4.5rem;
+}
+.tagloom-sheet {
+  justify-content: flex-end;
+}
+.tagloom-sheet-panel {
+  position: relative;
+  width: 100%;
+  max-height: 85dvh;
+  overflow: auto;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  background-color: var(--bulma-scheme-main);
+  border-radius: 1rem 1rem 0 0;
+}
+.tagloom-sheet-panel .tagloom-preview {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}
+/* TagLoom：Prompt 预览自动换行 */
+.tagloom-prompt {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* TagLoom：选词候选列表不撑开页面 */
+.tag-picker-list {
+  max-height: 14rem;
+  overflow: auto;
+}
+/* TagLoom 条目行：字号 14px、控件高 2em（28px）；不用 has-addons，平时输入框无边框，
+   悬停 / 聚焦才显示。左边两个控件：选择框（只用于批量操作）和启用开关（是否输出） */
+.prompt-item-row {
+  --bulma-control-height: 2em;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  border-radius: var(--bulma-radius);
+  padding-inline: 0.125rem;
+}
+.prompt-item-row:hover {
+  background-color: var(--bulma-scheme-main-bis);
+}
+.prompt-item-row.is-selected {
+  background-color: var(--bulma-link-soft);
+  box-shadow: inset 3px 0 0 var(--bulma-link);
+}
+.prompt-item-row .input,
+.prompt-item-row .button {
+  font-size: inherit;
+  height: var(--bulma-control-height);
+}
+.prompt-item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.prompt-item-row .prompt-item-text:not(:hover):not(:focus) {
+  border-color: transparent;
+  box-shadow: none;
+  background-color: transparent;
+}
+/* 停用：文字变淡 + 删除线（不只靠开关颜色） */
+.prompt-item-off .prompt-item-text {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+/* 选择框：命中区域比框本身大，方便点 */
+.prompt-item-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.75rem;
+  height: 2em;
+  cursor: pointer;
+}
+.prompt-item-select input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+}
+/* 启用开关：方形按钮，启用时填主题色 */
+.tagloom-enable {
+  flex: none;
+  width: var(--bulma-control-height, 2.5em);
+  height: var(--bulma-control-height, 2.5em);
+  padding: 0;
+  color: var(--bulma-text-weak);
+}
+.tagloom-enable.is-on {
+  background-color: var(--bulma-link);
+  border-color: var(--bulma-link);
+  color: var(--bulma-link-invert);
+}
+.prompt-item-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  flex: none;
+}
+.prompt-item-meta .tags,
+.prompt-item-meta .tag {
+  margin: 0;
+}
+.prompt-item-row .prompt-item-sync {
+  height: auto;
+  padding: 0 0.25rem;
+}
+.prompt-item-actions {
+  display: flex;
+  flex: none;
+}
+/* 上移 / 下移 / 删除：平时无边框，悬停这一行时才清楚 */
+.prompt-item-icon {
+  width: var(--bulma-control-height);
+  padding: 0;
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--bulma-text-weak);
+}
+.prompt-item-row .prompt-item-icon:disabled {
+  border-color: transparent;
+  background-color: transparent;
+  opacity: 0.3;
+}
+.prompt-item-row:hover .prompt-item-icon:not(:disabled),
+.prompt-item-icon:focus-visible {
+  border-color: var(--bulma-border);
+  color: var(--bulma-text);
+}
+.prompt-item-row:hover .prompt-item-icon.is-delete:not(:disabled),
+.prompt-item-icon.is-delete:focus-visible {
+  border-color: var(--bulma-danger);
+  color: var(--bulma-danger);
+}
+/* 拖动排序把手（dnd-kit）：触屏上拖把手不滚动页面 */
+.prompt-item-handle {
+  cursor: grab;
+  touch-action: none;
+}
+.prompt-item-row.is-dragging {
+  position: relative;
+  z-index: 5;
+  background-color: var(--bulma-scheme-main);
+  box-shadow: var(--bulma-shadow);
+}
+.prompt-item-row.is-dragging .prompt-item-handle {
+  cursor: grabbing;
+}
+/* 宽屏用把手排序，↑ ↓ 只在窄屏显示（窄屏手指拖动不顺手） */
+@media screen and (min-width: 769px) {
+  .prompt-item-step {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  .prompt-item-handle {
+    display: none;
+  }
+}
+/* 框选（viselect）：矩形本身没有样式，这里给半透明主题色；裁剪层叠在吸顶栏之上。
+   条目区域（除文本框）不能选中文字，从这里拖动框选时不会顺带选中页面文字。
+   不要改成框选时给 body 加类：整页重算样式，拖动刚开始会卡一下 */
+.prompt-item-marquee {
+  background-color: color-mix(in srgb, var(--bulma-link) 12%, transparent);
+  border: 1px solid var(--bulma-link);
+  border-radius: 2px;
+}
+.prompt-item-marquee-clip {
+  z-index: 40 !important;
+}
+.prompt-item-rows {
+  user-select: none;
+}
+.prompt-item-rows .prompt-item-text {
+  user-select: text;
+}
+/* 条目列表表头：全选框 + 标题；有选中时换成批量操作并吸顶（让开页面顶部操作栏）。
+   固定最小高度，切换时不推动下面的条目 */
+.prompt-item-head {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  margin-bottom: 0.25rem;
+  padding-inline: 0.125rem;
+  border-radius: var(--bulma-radius);
+}
+.prompt-item-head.is-active {
+  position: sticky;
+  top: var(--tagloom-bar-h, 0px);
+  z-index: 10;
+  background-color: var(--bulma-link-soft);
+  color: var(--bulma-link-bold);
+}
+.prompt-item-bulk {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+/* 窄屏：选择框、开关、文本占第一行，来源和按钮换到第二行；控件加高方便手指点（紧凑排列不换行，见下） */
+@media screen and (max-width: 768px) {
+  .prompt-item-row:not(.is-chip) {
+    --bulma-control-height: 2.5rem;
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+    padding-block: 0.125rem;
+  }
+  .prompt-item-row:not(.is-chip) .prompt-item-text {
+    flex-basis: calc(100% - 4.75rem);
+  }
+  .prompt-item-row:not(.is-chip) .prompt-item-meta {
+    flex: 1 1 auto;
+    /* 和上一行的文本左边对齐：选择框 1.75rem + 开关 2.5rem + 两个间距 */
+    padding-left: 4.75rem;
+  }
+  .prompt-item-icon {
+    border-color: var(--bulma-border);
+  }
+}
+/* 紧凑排列：一行放多条，每条是一个带底色的小块，宽度跟着文字走。
+   底色按来源区分：词库 = 浅蓝，自创 = 浅主色，文本 = 浅灰；未核查的词库标签用虚线边框；悬停整块看详情。
+   块里的选择框、把手、删除平时调淡，悬停 / 选中 / 正在编辑这一块时才清楚，让文字最显眼 */
+.prompt-item-rows.is-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+.prompt-item-row.is-chip {
+  --bulma-control-height: 1.75em;
+  --chip-bg: var(--bulma-scheme-main-ter);
+  --chip-border: var(--bulma-border);
+  display: inline-flex;
+  gap: 0.125rem;
+  max-width: 100%;
+  padding: 0.0625rem 0.125rem;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  background-color: var(--chip-bg);
+}
+.prompt-item-row.is-chip[data-source='catalog'],
+.prompt-item-row.is-chip[data-source='catalog-unchecked'] {
+  --chip-bg: var(--bulma-link-soft);
+  --chip-border: color-mix(in srgb, var(--bulma-link) 35%, transparent);
+}
+.prompt-item-row.is-chip[data-source='catalog-unchecked'] {
+  border-style: dashed;
+}
+.prompt-item-row.is-chip[data-source='custom'] {
+  --chip-bg: var(--bulma-primary-soft);
+  --chip-border: color-mix(in srgb, var(--bulma-primary) 40%, transparent);
+}
+.prompt-item-row.is-chip[data-source='custom-missing'] {
+  --chip-bg: var(--bulma-danger-soft);
+  --chip-border: var(--bulma-danger);
+}
+/* 停用：整块变淡、虚线边框（文字另有删除线） */
+.prompt-item-row.is-chip.prompt-item-off {
+  --chip-bg: transparent;
+  border-style: dashed;
+}
+.prompt-item-row.is-chip:hover {
+  background-color: color-mix(in srgb, var(--chip-bg) 70%, var(--bulma-text)
+    6%);
+}
+.prompt-item-row.is-chip.is-selected {
+  box-shadow: 0 0 0 2px var(--bulma-link);
+}
+/* 块里的开关不填色：启用 = 主题色眼睛，停用 = 灰色划线眼睛 */
+.prompt-item-row.is-chip .tagloom-enable {
+  border-color: transparent;
+  background-color: transparent;
+  border-radius: 999px;
+  color: var(--bulma-text-weak);
+}
+.prompt-item-row.is-chip .tagloom-enable.is-on {
+  color: var(--bulma-link);
+}
+.prompt-item-row.is-chip .prompt-item-select,
+.prompt-item-row.is-chip .prompt-item-actions {
+  opacity: 0.35;
+  transition: opacity 0.1s;
+}
+.prompt-item-row.is-chip:hover .prompt-item-select,
+.prompt-item-row.is-chip:hover .prompt-item-actions,
+.prompt-item-row.is-chip:focus-within .prompt-item-select,
+.prompt-item-row.is-chip:focus-within .prompt-item-actions,
+.prompt-item-row.is-chip.is-selected .prompt-item-select,
+.prompt-item-row.is-chip.is-selected .prompt-item-actions,
+.prompt-item-rows.is-chips:has(.is-selected) .prompt-item-select {
+  opacity: 1;
+}
+.prompt-item-row.is-chip .prompt-item-icon {
+  border-radius: 999px;
+}
+.prompt-item-row.is-chip .prompt-item-text {
+  color: var(--bulma-text-strong);
+}
+.prompt-item-row.is-chip .prompt-item-select {
+  width: 1.25rem;
+  height: var(--bulma-control-height);
+}
+.prompt-item-row.is-chip .prompt-item-select input {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.prompt-item-row.is-chip .prompt-item-text {
+  flex: 0 1 auto;
+  field-sizing: content;
+  min-width: 3ch;
+  max-width: 100%;
+  padding-inline: 0.25rem;
+}
+.prompt-item-row.is-chip .prompt-item-icon {
+  width: 1.25rem;
+}
+.prompt-item-row.is-chip .prompt-item-meta:empty {
+  display: none;
+}
+@media screen and (max-width: 768px) {
+  .prompt-item-row.is-chip {
+    --bulma-control-height: 2.25rem;
+  }
+  .prompt-item-row.is-chip .prompt-item-icon {
+    width: 1.75rem;
+  }
+}
+/* 编辑页顶部栏的「紧凑 / 列表」切换（所有条目列表） */
+.tagloom-layout-switch {
+  flex: none;
+}
+/* 人物文件浏览：长路径、档案和 JSON 不撑开窄屏。 */
+.tagloom-file-breadcrumb ul {
+  flex-wrap: wrap;
+}
+.tagloom-file-name,
+.tagloom-file-breadcrumb a {
+  overflow-wrap: anywhere;
+}
+.tagloom-file-profile,
+.tagloom-file-source {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 32rem;
+  overflow: auto;
+}
+.tagloom-file-name a {
+  display: inline-block;
+  padding-block: 0.5rem;
+}
+.tagloom-file-source {
+  font-size: 0.875rem;
+}
+
+.tagloom-picker-surface {
+  background-color: var(--bulma-scheme-main-ter);
+  border: 1px solid var(--bulma-border-weak);
+}
+
+/* 自然语言筛选：标签按钮可换行，依据用小字 */
+.tagloom-text-match-tier summary {
+  cursor: pointer;
+}
+.tagloom-text-match-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.tagloom-text-match-tag {
+  height: auto;
+  white-space: normal;
+  text-align: start;
+  max-width: 100%;
+}
+.tagloom-text-match-canonical,
+.tagloom-text-match-evidence {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+/* 标签按钮和它的 ⓘ 连在一起；详情栏正在显示的标签加描边 */
+.tagloom-text-match-item {
+  display: inline-flex;
+  max-width: 100%;
+}
+.tagloom-text-match-item > .button + .button {
+  margin-inline-start: 1px;
+}
+.tagloom-text-match-item.is-active > .tagloom-text-match-tag {
+  outline: 2px solid var(--bulma-link);
+  outline-offset: 1px;
+}
+/* 宽屏详情栏：随页面滚动保持可见，内容多时栏内滚动 */
+.tagloom-text-match-detail {
+  position: sticky;
+  top: 0.75rem;
+  max-height: calc(100dvh - 1.5rem);
+  overflow: auto;
+}
+.tagloom-text-match-detail-body {
+  overflow-wrap: anywhere;
+}
+.tagloom-text-match-trail .button.is-text {
+  height: auto;
+  text-decoration: underline;
+}
+.tagloom-text-match-browse {
+  border-top: 1px solid var(--bulma-border-weak);
+}
+.theme-warning-text {
+  color: var(--bulma-warning-soft-invert);
+}
+
+/* 主题开关：一个图标按钮，在导航最右边（窄屏在汉堡按钮左边） */
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--bulma-radius);
+  background: none;
+  color: var(--bulma-text);
+  cursor: pointer;
+}
+.theme-switch:hover {
+  background-color: var(--bulma-background);
+  color: var(--bulma-text-strong);
+}
+.theme-switch:focus-visible {
+  outline: 2px solid var(--bulma-link);
+  outline-offset: -2px;
+}
+.theme-switch svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.navbar-end .theme-switch.navbar-item {
+  margin-right: 0.5rem;
+}
+/* 汉堡按钮默认靠右（margin-left: auto），开关已经把它推过去了 */
+.navbar-brand .theme-switch + .navbar-burger {
+  margin-left: 0;
+}
+
+/* 插件主题层（TagLoom、NovelAI 的根元素带 .app-theme）：只在插件页面里生效，拉开 Bulma 默认灰阶的层级（默认面板与页面只差 1.1:1）。
+   亮度变量（-l）由按钮、输入框在自身上重新计算，直接生效；合成颜色在 :root 上算好后才继承，
+   所以下面把用到的合成颜色按 Bulma 的公式重新声明一遍。数值：控件边框约 3:1，弱文字 ≥5:1。 */
+.app-theme {
+  --bulma-scheme-main-bis-l: 97%;
+  --bulma-scheme-main-ter-l: 93%;
+  --bulma-border-weak-l: 85%;
+  --bulma-border-l: 58%;
+  --bulma-text-weak-l: 40%;
+  /* TagLoom 栏目“有内容”色条：比默认信息色深，在白底上约 3.9:1 */
+  --tagloom-status: hsl(var(--bulma-info-h), var(--bulma-info-s), 40%);
+}
+[data-theme='dark'] .app-theme {
+  --bulma-scheme-main-bis-l: 13%;
+  --bulma-scheme-main-ter-l: 17%;
+  --bulma-border-weak-l: 26%;
+  --bulma-border-l: 45%;
+  --bulma-text-weak-l: 65%;
+  --tagloom-status: hsl(var(--bulma-info-h), var(--bulma-info-s), 55%);
+}
+.app-theme,
+[data-theme='dark'] .app-theme {
+  --bulma-scheme-main-bis: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    var(--bulma-scheme-main-bis-l)
+  );
+  --bulma-scheme-main-ter: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    var(--bulma-scheme-main-ter-l)
+  );
+  --bulma-border-weak: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    var(--bulma-border-weak-l)
+  );
+  --bulma-border: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    var(--bulma-border-l)
+  );
+  --bulma-border-hover: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    calc(var(--bulma-border-l) + var(--bulma-hover-border-l-delta))
+  );
+  --bulma-border-active: hsl(
+    var(--bulma-scheme-h),
+    var(--bulma-scheme-s),
+    calc(var(--bulma-border-l) + var(--bulma-active-border-l-delta))
+  );
+  --bulma-text-weak: hsl(
+    var(--bulma-text-h),
+    var(--bulma-text-s),
+    var(--bulma-text-weak-l)
+  );
+}
+/* Bulma 的 .has-text-grey 是固定的 48% 灰（!important），在灰色面板上不到 4.5:1：改用弱文字色 */
+.app-theme .has-text-grey {
+  color: var(--bulma-text-weak) !important;
+}
+/* 已选的选词按钮是实心底色：按钮里的次要文字跟随按钮文字色，不用灰色 */
+.app-theme .button.is-link .has-text-grey {
+  color: inherit !important;
+  opacity: 0.85;
+}
+/* 卡片之间靠细边框分开，不只靠阴影。用内缩的 outline：画在子元素背景之上，
+   也不会被可滚动的父容器（如右侧预览）裁掉 */
+.app-theme .card,
+.app-theme .box {
+  box-shadow: none;
+  outline: 1px solid var(--bulma-border-weak);
+  outline-offset: -1px;
+}
+.app-theme .table td,
+.app-theme .table th {
+  border-color: var(--bulma-border-weak);
+}
+/* 键盘焦点：统一 2px 实线并留出间距 */
+.app-theme :focus-visible {
+  outline: 2px solid var(--bulma-link);
+  outline-offset: 2px;
+}
+/* 浅色按钮（is-light）Bulma 把边框宽度设成 0，在白底上几乎看不出按钮边界：用文字色描边 */
+.app-theme .button.is-light {
+  --bulma-button-border-width: 1px;
+  border-color: currentColor;
+}
+/* 不带颜色的浅色标签（“内置”、计数、已取消）：Bulma 暗色下字是近白色、底也是近白色，看不见；
+   改用中性面板底 + 强文字 + 细边框，亮暗都清楚。带颜色的 is-light 标签不受影响 */
+.app-theme .tag.is-light:not(.is-primary):not(.is-link):not(.is-info):not(.is-success):not(.is-warning):not(.is-danger) {
+  color: var(--bulma-text-strong);
+  background-color: var(--bulma-scheme-main-ter);
+  box-shadow: inset 0 0 0 1px var(--bulma-border-weak);
+}
+/* 标签页底线用细分隔线色，当前标签（加框）才用控件边框色，选中项更突出 */
+.app-theme .tabs {
+  --bulma-tabs-border-bottom-color: var(--bulma-border-weak);
+}
+/* 正在生成的任务：左侧主色条（上面统一去掉了卡片阴影，这里要单独保留） */
+.app-theme .active-job.is-running {
+  box-shadow: inset 4px 0 0 var(--bulma-primary);
+}
+
+/* 栏目记录状态：色条形状 + 颜色 + 文字（有内容：6px 实线、✓；未填写：2px 虚线）。 */
+.tagloom-section {
+  border-inline-start: 2px dashed var(--bulma-border);
+}
+.tagloom-section.has-content {
+  border-inline-start: 6px solid var(--tagloom-status);
+}
+.tagloom-section-toggle {
+  height: auto;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  justify-content: flex-start;
+  white-space: normal;
+  text-align: start;
+  border: none;
+  color: var(--bulma-text-strong);
+  background-color: var(--bulma-scheme-main-ter);
+}
+.tagloom-section.has-content .tagloom-section-toggle {
+  background-color: var(--bulma-info-soft);
+}
+.tagloom-section-toggle {
+  transition: filter 150ms ease-out;
+}
+.tagloom-section-toggle:hover {
+  filter: brightness(0.95);
+}
+.tagloom-section-toggle:focus-visible {
+  outline: 2px solid var(--bulma-link);
+  outline-offset: -2px;
+}
+.tagloom-section-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tagloom-section-summary {
+  flex-basis: 100%;
+  margin-top: 0.25rem;
+  font-weight: normal;
+  overflow-wrap: anywhere;
+}
+.tagloom-section-toggle {
+  flex-wrap: wrap;
+}
+.tagloom-content-badge {
+  flex-shrink: 0;
+  margin-inline-start: 0.5rem;
+  color: var(--bulma-text-strong);
+  background-color: var(--bulma-scheme-main-bis);
+  border: 1px solid var(--bulma-border);
+}
+.tagloom-content-badge.has-content {
+  color: var(--bulma-info-soft-invert);
+  background-color: var(--bulma-info-soft);
+  border-color: var(--tagloom-status);
+}
+.tagloom-content-badge.is-empty {
+  color: var(--bulma-text-weak);
+  border-style: dashed;
+}
+
+/* TagLoom 全局标签搜索：在顶部操作栏里，结果浮在页面上方，可滚动 */
+.tagloom-global-search {
+  position: relative;
+  margin-top: 0.5rem;
+}
+.tagloom-global-search .icon.is-left {
+  color: var(--bulma-text-weak);
+}
+.tagloom-global-search-panel {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 30;
+  max-height: min(28rem, 60dvh);
+  overflow: auto;
+  box-shadow: var(--bulma-shadow);
+}
+.tagloom-global-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--bulma-radius);
+}
+.tagloom-global-search-row + .tagloom-global-search-row {
+  border-top: 1px solid var(--bulma-border-weak);
+}
+.tagloom-global-search-row.is-active {
+  background-color: var(--bulma-scheme-main-ter);
+}
+.tagloom-global-search-tag {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* 分类添加输入框的下拉建议 */
+.tagloom-add-suggest {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+.tagloom-add-suggest-panel {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 25;
+  max-height: min(24rem, 55dvh);
+  overflow: auto;
+  box-shadow: var(--bulma-shadow);
+}
+.tagloom-add-suggest-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--bulma-radius);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.tagloom-add-suggest-option:hover,
+.tagloom-add-suggest-option.is-active {
+  background-color: var(--bulma-scheme-main-ter);
+}
+.tagloom-add-suggest-option.is-active {
+  box-shadow: inset 3px 0 0 var(--bulma-link);
+}
+.tagloom-add-suggest-option.is-done {
+  cursor: default;
+  color: var(--bulma-text-weak);
+}
+.tagloom-global-search-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+/* TagLoom 场景：人物槽位里关掉输出的快照段 */
+tr.prompt-item-off code,
+tr.prompt-item-off th {
+  opacity: 0.55;
+}
+tr.prompt-item-off code {
+  text-decoration: line-through;
+}
+/* 人物位置：5 × 5 网格 */
+.tagloom-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1.75rem);
+  gap: 2px;
+  flex-shrink: 0;
+}
+.tagloom-slot-grid .button {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+/* 选择人物对话框：列表可滚动 */
+.tagloom-picker-list {
+  max-height: 50dvh;
+  overflow: auto;
+}
+.tagloom-picker-list .button {
+  height: auto;
+  white-space: normal;
+  text-align: left;
+}
+/* 快照表：文本列占满剩余宽度 */
+.tagloom-snapshot-table th,
+.tagloom-snapshot-table td {
+  vertical-align: middle;
+}
+/* 表格字小，开关也小一号（2em = 24px） */
+.tagloom-snapshot-table .tagloom-enable {
+  --bulma-control-height: 2em;
+}
+.tagloom-snapshot-table td:nth-child(2) {
+  width: 100%;
+}
+
+/* NovelAI 新建任务：导入确认弹窗 */
+.nai-import-head {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.nai-import-thumb {
+  width: 6rem;
+  max-height: 9rem;
+  object-fit: contain;
+  flex: none;
+  border-radius: var(--bulma-radius-small);
+  background: var(--bulma-scheme-main-bis);
+}
+.nai-import-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.25rem 0;
+}
+.nai-import-group .has-text-grey {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* 角色追加 / 替换：缩进到「角色」那一行下面 */
+.nai-import-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0 0.25rem 1.5rem;
+}
+.nai-import-mode .radio + .radio {
+  margin-inline-start: 0;
+}
+
+/* NovelAI 可折叠区块：队列设置（标题行显示已保存的关键设置）、任务详情的调试信息 */
+.nai-queue-settings > summary,
+.nai-debug > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+.nai-queue-settings > summary::-webkit-details-marker,
+.nai-debug > summary::-webkit-details-marker {
+  display: none;
+}
+/* 自己画展开箭头：折叠 ▸，展开 ▾ */
+.nai-queue-settings > summary::before,
+.nai-debug > summary::before {
+  content: '';
+  align-self: center;
+  width: 0.45em;
+  height: 0.45em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease-out;
+  margin-right: 0.15rem;
+}
+.nai-queue-settings[open] > summary::before,
+.nai-debug[open] > summary::before {
+  transform: rotate(45deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nai-queue-settings > summary::before,
+  .nai-debug > summary::before {
+    transition: none;
+  }
+}
+.nai-settings-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* NovelAI 队列页的状态提示（暂停、冷却、当前任务）：同样的紧凑高度和左侧色条，读起来是一组 */
+.novelai-app .nai-status {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--bulma-radius);
+}
+/* 只有几块紧挨着时才收紧间距（最近结果页只有当前任务卡，保持默认间距） */
+.novelai-app .nai-status:has(+ .nai-status) {
+  margin-bottom: 0.5rem;
+}
+.novelai-app .nai-status.notification {
+  box-shadow: inset 4px 0 0 currentColor;
+}
+.novelai-app .nai-status.notification.is-danger {
+  box-shadow: inset 4px 0 0 var(--bulma-danger);
+}
+.novelai-app .nai-status.notification.is-info {
+  box-shadow: inset 4px 0 0 var(--bulma-info);
+}
+.novelai-app .nai-status.box:not(.is-running) {
+  box-shadow: inset 4px 0 0 var(--bulma-border);
+}
+
+/* NovelAI 队列设置：默认画风（宽）+ 请求间隔（窄）一行，窄屏叠成一列 */
+.nai-queue-settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem 1.5rem;
+  align-items: start;
+  margin-bottom: 0.75rem;
+}
+@media (max-width: 768px) {
+  .nai-queue-settings-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* NovelAI 新建任务页顶部：面包屑 + 账户用量（Anlas、V5 免费额度），窄屏折行 */
+.novelai-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 1.5rem;
+}
+.novelai-usage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}
+.novelai-usage > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.novelai-usage .progress {
+  width: 4rem;
+  margin-bottom: 0;
+}
+
+/* NovelAI 插件导航：吸顶；左边标签页（窄屏横向滚动），右边固定「新建任务」主按钮 */
+.novelai-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+  background-color: var(--bulma-scheme-main);
+  border-bottom: 1px solid var(--bulma-border-weak);
+}
+.novelai-nav .tabs {
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: flex-end;
+  margin-bottom: -0.5rem;
+}
+.novelai-nav .tabs ul {
+  border-bottom: none;
+}
+.novelai-nav .tabs {
+  scrollbar-width: thin;
+}
+.novelai-new-job {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+/* 当前就在新建页：按钮保留位置但改成浅色，表示“在这里” */
+.novelai-new-job.is-current {
+  --bulma-button-border-width: 1px;
+  background-color: var(--bulma-primary-soft);
+  border-color: var(--bulma-primary);
+  color: var(--bulma-primary-bold);
+}
+/* 页面里的吸顶操作栏让开导航 */
+.novelai-app .action-bar.is-top {
+  top: var(--novelai-nav-h, 0px);
+}
+/* 窄屏：按钮缩成“＋ 新建”，给标签页腾地方（完整文字仍供读屏） */
+@media screen and (max-width: 480px) {
+  .novelai-new-job-tail {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* 会被画风模板覆盖的字段（强制使用模板参数）：Bulma 的浅黄边框在白底上太淡，换成可读的警告色并加左侧色条；
+   字段下方另有“模板值：…”文字，不只靠颜色 */
+.app-theme .input.is-warning,
+.app-theme .select.is-warning select {
+  border-color: var(--bulma-warning-on-scheme);
+  box-shadow: inset 3px 0 0 var(--bulma-warning-on-scheme);
+}
+.app-theme .select.is-warning:not(.is-multiple):not(.is-loading)::after {
+  border-color: var(--bulma-warning-on-scheme);
+}
+/* 「以画风模板的参数为准」勾选卡片：整块可点，勾选后用警告色边框，与下方标黄字段对应 */
+.app-theme .force-template-toggle {
+  border: 1px solid var(--bulma-border);
+  border-radius: var(--bulma-radius);
+  padding: 0.5rem 0.75rem;
+  background: var(--bulma-scheme-main);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.app-theme .force-template-toggle.is-checked {
+  border-color: var(--bulma-warning-on-scheme);
+  box-shadow: inset 4px 0 0 var(--bulma-warning-on-scheme);
+}
+.app-theme .force-template-toggle-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+.app-theme .force-template-toggle.is-disabled .force-template-toggle-main {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.app-theme .force-template-toggle-main input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  flex: none;
+  accent-color: var(--bulma-warning-on-scheme);
+  cursor: inherit;
+}
+.app-theme .force-template-toggle-title {
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-theme .force-template-toggle {
+    transition: none;
+  }
+}
+/* 一行版（新建页的画风行）：和按钮同高，勾选后同样加警示色边 */
+.app-theme .force-template-toggle.is-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--bulma-control-height, 2.5em);
+  padding: 0 0.75rem;
+  cursor: pointer;
+}
+.app-theme .force-template-toggle.is-compact input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--bulma-warning-on-scheme);
+  cursor: inherit;
+}
+.app-theme .force-template-toggle.is-compact.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+/* NovelAI 新建页：文件拖到页面上时，导入按钮高亮 */
+.nai-import-button.is-over {
+  border-color: var(--bulma-link);
+  background: var(--bulma-link-soft);
+  color: var(--bulma-link-bold);
+}
+/* 操作按钮行里的勾选项：和按钮同高、垂直居中 */
+.nai-button-check {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: var(--bulma-control-height, 2.5em);
+  margin-bottom: 0.5rem;
+}
